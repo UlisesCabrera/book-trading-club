@@ -7,5 +7,3 @@ require('bootstrap');
 require("./homePage/homePage.module");
 
 angular.module('BookTradingClub', ['HomePageModule']);
-
-

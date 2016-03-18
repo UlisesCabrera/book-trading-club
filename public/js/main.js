@@ -8,9 +8,6 @@ require('bootstrap');
 require("./homePage/homePage.module");
 
 angular.module('BookTradingClub', ['HomePageModule']);
-
-
-
 },{"./homePage/homePage.module":3,"angular":5,"bootstrap":6,"jquery":19}],2:[function(require,module,exports){
 /*global angular*/
 
