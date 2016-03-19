@@ -6,8 +6,18 @@
     <script src="/js/main.js"></script>
   </head>
   <body ng-controller='HomePageController'>
+    <nav-dir></nav-dir>
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
-    <p>{{message}}</p>
+  
+  <script type="text/javascript">
+	  
+	  // fix the facebook url bug
+		if (window.location.hash === '#_=_') window.location.hash = '#!';
+		
+		// pass the user object from the server so it can be used by angular
+		window.user = <%- user || 'null' %>;
+		
+	</script>    
   </body>
 </html>
