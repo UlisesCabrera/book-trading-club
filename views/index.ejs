@@ -22,6 +22,7 @@
           <ul class="nav navbar-nav navbar-right">
             <li><a  href='#/profile/{{ currentUser() }}' ng-show='currentUser()'>Profile</a></li>
             <li><a href='#/'>Home</a></li>
+            <li><a href='#/books'>All Books</a></li>
           </ul>
           <p ng-show='currentUser()' style='color:white' class="navbar-text navbar-right">Signed in as {{ currentUser().name }}</p>
         </div>

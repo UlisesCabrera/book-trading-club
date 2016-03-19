@@ -8,8 +8,9 @@ require('bootstrap');
 //require sub-modules
 require("./homePage/homePage.module");
 require("./profilePage/profilePage.module");
+require("./bookPages/bookPages.module");
 
-angular.module('BookTradingClub', ['ngRoute', 'HomePageModule', 'ProfilePageModule'])
+angular.module('BookTradingClub', ['ngRoute', 'HomePageModule', 'ProfilePageModule','BookPagesModule'])
     .config(function($routeProvider, $locationProvider) {
       $routeProvider
        .when('/', {
@@ -19,6 +20,10 @@ angular.module('BookTradingClub', ['ngRoute', 'HomePageModule', 'ProfilePageModu
       .when('/profile/:user', {
         templateUrl: 'views/profilePage/profilePage.html',
         controller: 'ProfilePageController'
+      })
+      .when('/books',{
+        templateUrl: 'views/bookPages/allBooksPage.html',
+        controller: 'AllBookPageController'
       });
 }).controller('BookTradingClubController',['$scope', 
     function($scope){
