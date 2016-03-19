@@ -25,8 +25,8 @@ module.exports = function(passport, db) {
             //if not, create new user
             var newUser = {
               name : profile.displayName,
-              email: '',
-              password: '',
+              city: '',
+              state: '',
               myBooksIDs : [],
               booksBorrowedId : [],
               pendingRequestsFromUsers : [],
@@ -37,7 +37,7 @@ module.exports = function(passport, db) {
               assert.equal(err, null,'error inserting user');
               assert.equal(result.result.ok, 1, 'problem inserting document');
               // and return inserted user
-              console.log(result.insertedCount);
+              console.log('inserted document: ' + result.insertedCount);
               return done(null, result.ops[0]);
             });
             

@@ -5,15 +5,57 @@
     <link rel='stylesheet' href='/css/style.css' />
     <script src="/js/main.js"></script>
   </head>
-  <body ng-controller='HomePageController'>
-    <nav-dir></nav-dir>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+  <body ng-controller='BookTradingClubController'>
+    <nav class="navbar navbar-default navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          
+          <button type="button" data-toggle="modal" data-target=".sign-in-modal" class="btn btn-default navbar-btn" ng-hide='currentUser()'>Sign in</button>
+          <a  href='/auth/signout' class="btn btn-default navbar-btn" ng-show='currentUser()' >Sign out</a>
+      
+          <ul class="nav navbar-nav navbar-right">
+            <li><a  href='#/profile/{{ currentUser() }}' ng-show='currentUser()'>Profile</a></li>
+            <li><a href='#/'>Home</a></li>
+          </ul>
+          <p ng-show='currentUser()' style='color:white' class="navbar-text navbar-right">Signed in as {{ currentUser().name }}</p>
+        </div>
+      </div><!-- /.container-fluid -->
+    </nav>
+    
+    
+    <div class="modal fade sign-in-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title text-center">Sign in with:</h4>
+          </div>        
+          <div class="modal-body">
+            <div class="btn-group btn-group-justified" role="group" aria-label="sign-in-buttons">
+              <div class="btn-group" role="group">
+                <a href='/auth/twitter'class="btn btn-info">Twitter</a>
+              </div>
+              <div class="btn-group" role="group">
+                <a  href='/auth/facebook' class="btn btn-primary">Facebook</a>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>    
+  <ng-view></ng-view>
   
   <script type="text/javascript">
 	  
 	  // fix the facebook url bug
-		if (window.location.hash === '#_=_') window.location.hash = '#!';
+		if (window.location.hash === '#_=_') window.location.hash = '#';
 		
 		// pass the user object from the server so it can be used by angular
 		window.user = <%- user || 'null' %>;

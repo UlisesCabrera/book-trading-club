@@ -1,7 +1,7 @@
 /*global angular*/
 module.exports = angular.module('HomePageModule')
- .directive('navDir',function(){
+ .directive('aboutUs',function(){
      return {
-         templateUrl: 'directive-views/homePage/navigation.html'
+         templateUrl: 'views/homePage/directives/aboutUs.html'
      };
  });
