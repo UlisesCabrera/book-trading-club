@@ -32,22 +32,58 @@ angular.module('BookTradingClub', ['ngRoute', 'HomePageModule', 'ProfilePageModu
             return window.user ? window.user : null;
         };
 }]);
-},{"./bookPages/bookPages.module":2,"./homePage/homePage.module":7,"./profilePage/profilePage.module":9,"angular":13,"angular-route":11,"bootstrap":14,"jquery":27}],2:[function(require,module,exports){
+},{"./bookPages/bookPages.module":2,"./homePage/homePage.module":8,"./profilePage/profilePage.module":10,"angular":14,"angular-route":12,"bootstrap":15,"jquery":28}],2:[function(require,module,exports){
 /*global angular*/
 
 //exports module
 module.exports = angular.module('BookPagesModule',[]);
 
 // require all controllers, services, directives
+require("./services/books.client.service");
 require("./controllers/allBooksPage.client.controller");
 require("./directives/bookPages.client.directive");
-},{"./controllers/allBooksPage.client.controller":3,"./directives/bookPages.client.directive":4}],3:[function(require,module,exports){
+},{"./controllers/allBooksPage.client.controller":3,"./directives/bookPages.client.directive":4,"./services/books.client.service":5}],3:[function(require,module,exports){
 /*global angular*/
 
 module.exports = angular.module('BookPagesModule')
- .controller('AllBookPageController', ['$scope', 
-    function($scope){
-    $scope.test = 'hello All Books'
+ .controller('AllBookPageController', ['$scope','BooksSvc', 
+    function($scope, BooksSvc){
+   
+    $scope.test = 'hello All Books';
+    
+    $scope.newBook = {
+      name: '',
+      imgUrl: '',
+      owner_id : '',
+      lenders_id : []
+    };
+    
+    // will hold all the books
+    $scope.books = [];
+    
+    $scope.addBook = function(userId) {
+      $scope.newBook.owner_id = userId;
+      
+      BooksSvc.newBook($scope.newBook)
+        .then(
+            function(res){
+                 if (res.data.state === "success") {
+                				$scope.books.push(res.data.book);
+            	   		} 
+          	   			 // error, grab the error message from the response and display it on the form.
+          	   		  $scope.message = res.data.message;
+            	   		$scope.newBook = {name:'', imgUrl: ''};
+        	   		    // hides modal
+        	   		    $('#newBookModal').modal('hide');                  				
+            },
+            function(error) {
+      	        $scope.message = 'error getting to the server : ' + error.status + ' ' + error.statusText;
+	        } 
+        );
+    };
+    
+    
+    
 }]);
 },{}],4:[function(require,module,exports){
 /*global angular*/
@@ -56,8 +92,20 @@ module.exports = angular.module('BookPagesModule')
      return {
          templateUrl: 'views/bookPages/directives/allBooks.html'
      };
+ }).directive('addBook', function(){
+     return {
+       templateUrl: 'views/bookPages/directives/addBook.html'
+     };
  });
 },{}],5:[function(require,module,exports){
+/*global angular*/
+module.exports = angular.module('BookPagesModule', []).service('BooksSvc', ['$http', function($http) {
+            // creates new book
+            this.newBook = function(newBook) {
+                return $http.post('/books', newBook);
+            };
+}]);
+},{}],6:[function(require,module,exports){
 /*global angular*/
 
 module.exports = angular.module('HomePageModule')
@@ -65,7 +113,7 @@ module.exports = angular.module('HomePageModule')
     function($scope){
     $scope.test = 'hello homepage'
 }]);
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 /*global angular*/
 module.exports = angular.module('HomePageModule')
  .directive('aboutUs',function(){
@@ -73,7 +121,7 @@ module.exports = angular.module('HomePageModule')
          templateUrl: 'views/homePage/directives/aboutUs.html'
      };
  });
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*global angular*/
 
 //exports module
@@ -82,7 +130,7 @@ module.exports = angular.module('HomePageModule',[]);
 // require all controllers, services, directives
 require("./controllers/homePage.client.controller");
 require("./directives/homePage.client.directive");
-},{"./controllers/homePage.client.controller":5,"./directives/homePage.client.directive":6}],8:[function(require,module,exports){
+},{"./controllers/homePage.client.controller":6,"./directives/homePage.client.directive":7}],9:[function(require,module,exports){
 /*global angular*/
 
 module.exports = angular.module('ProfilePageModule')
@@ -90,7 +138,7 @@ module.exports = angular.module('ProfilePageModule')
     function($scope, $routeParams){
      $scope.user = JSON.parse($routeParams.user);
 }]);
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /*global angular*/
 
 //exports module
@@ -98,7 +146,7 @@ module.exports = angular.module('ProfilePageModule',[]);
 
 // require all controllers, services, directives
 require("./controllers/profilePage.client.controller");
-},{"./controllers/profilePage.client.controller":8}],10:[function(require,module,exports){
+},{"./controllers/profilePage.client.controller":9}],11:[function(require,module,exports){
 /**
  * @license AngularJS v1.5.2
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -1122,11 +1170,11 @@ function ngViewFillContentFactory($compile, $controller, $route) {
 
 })(window, window.angular);
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 require('./angular-route');
 module.exports = 'ngRoute';
 
-},{"./angular-route":10}],12:[function(require,module,exports){
+},{"./angular-route":11}],13:[function(require,module,exports){
 /**
  * @license AngularJS v1.5.1
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -31696,11 +31744,11 @@ $provide.value("$locale", {
 })(window, document);
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 require('./angular');
 module.exports = angular;
 
-},{"./angular":12}],14:[function(require,module,exports){
+},{"./angular":13}],15:[function(require,module,exports){
 // This file is autogenerated via the `commonjs` Grunt task. You can require() this file in a CommonJS environment.
 require('../../js/transition.js')
 require('../../js/alert.js')
@@ -31714,7 +31762,7 @@ require('../../js/popover.js')
 require('../../js/scrollspy.js')
 require('../../js/tab.js')
 require('../../js/affix.js')
-},{"../../js/affix.js":15,"../../js/alert.js":16,"../../js/button.js":17,"../../js/carousel.js":18,"../../js/collapse.js":19,"../../js/dropdown.js":20,"../../js/modal.js":21,"../../js/popover.js":22,"../../js/scrollspy.js":23,"../../js/tab.js":24,"../../js/tooltip.js":25,"../../js/transition.js":26}],15:[function(require,module,exports){
+},{"../../js/affix.js":16,"../../js/alert.js":17,"../../js/button.js":18,"../../js/carousel.js":19,"../../js/collapse.js":20,"../../js/dropdown.js":21,"../../js/modal.js":22,"../../js/popover.js":23,"../../js/scrollspy.js":24,"../../js/tab.js":25,"../../js/tooltip.js":26,"../../js/transition.js":27}],16:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: affix.js v3.3.6
  * http://getbootstrap.com/javascript/#affix
@@ -31878,7 +31926,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: alert.js v3.3.6
  * http://getbootstrap.com/javascript/#alerts
@@ -31974,7 +32022,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: button.js v3.3.6
  * http://getbootstrap.com/javascript/#buttons
@@ -32096,7 +32144,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: carousel.js v3.3.6
  * http://getbootstrap.com/javascript/#carousel
@@ -32335,7 +32383,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: collapse.js v3.3.6
  * http://getbootstrap.com/javascript/#collapse
@@ -32548,7 +32596,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.6
  * http://getbootstrap.com/javascript/#dropdowns
@@ -32715,7 +32763,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: modal.js v3.3.6
  * http://getbootstrap.com/javascript/#modals
@@ -33054,7 +33102,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: popover.js v3.3.6
  * http://getbootstrap.com/javascript/#popovers
@@ -33164,7 +33212,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.6
  * http://getbootstrap.com/javascript/#scrollspy
@@ -33338,7 +33386,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tab.js v3.3.6
  * http://getbootstrap.com/javascript/#tabs
@@ -33495,7 +33543,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tooltip.js v3.3.6
  * http://getbootstrap.com/javascript/#tooltip
@@ -34011,7 +34059,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: transition.js v3.3.6
  * http://getbootstrap.com/javascript/#transitions
@@ -34072,7 +34120,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.2
  * http://jquery.com/

@@ -1,7 +1,6 @@
 exports.socialLoginLogic = {
-	// if success go to home page, if not stay at login '#' angular view
 		 successRedirect: '/',
-         failureRedirect: '/#login'
+         failureRedirect: '/'
 };
 
 exports.logout = function(req, res) {

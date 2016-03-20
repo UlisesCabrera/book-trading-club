@@ -1,2 +1,7 @@
+<div class="alert alert-warning alert-dismissible" role="alert" ng-if='message'>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  {{ message }}
+</div>
+
+<add-book ng-if='$parent.currentUser()'></add-book>
 <all-books></all-books>
-<p>{{ test }}</p>

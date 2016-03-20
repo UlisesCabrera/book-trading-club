@@ -4,4 +4,8 @@ module.exports = angular.module('BookPagesModule')
      return {
          templateUrl: 'views/bookPages/directives/allBooks.html'
      };
+ }).directive('addBook', function(){
+     return {
+       templateUrl: 'views/bookPages/directives/addBook.html'
+     };
  });
