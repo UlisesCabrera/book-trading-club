@@ -1,5 +1,5 @@
 var MongoClient = require("mongodb").MongoClient;
-var ObjectID = require('mongodb').ObjectID
+var ObjectID = require('mongodb').ObjectID;
 var assert = require('assert');
 
 module.exports = function(passport) {
@@ -10,11 +10,14 @@ module.exports = function(passport) {
     assert.equal(err, null, 'Error occured while connecting to the database');
     var usersCollection = db.collection('users');
     
-    
+    //facebook strategy
     require("./strategies/fb")(passport, db);
   
     //twitter strategy
     require("./strategies/twitter")(passport, db);
+    
+    //local strategy
+    require('./strategies/local')(passport,db);
 
     // Passport needs to be able to serialize and deserialize users to support persistent login sessions
     passport.serializeUser(function(user, done) {

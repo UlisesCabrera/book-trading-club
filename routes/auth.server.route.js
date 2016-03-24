@@ -3,6 +3,15 @@ var router = express.Router();
 var authCtrl =  require("../controllers/auth.server.controller");
 
 module.exports = function(passport){
+	
+	//log in local
+	router.post('/login', passport.authenticate('login', authCtrl.localLoginLogic));
+	//sign up local
+	router.post('/signup', passport.authenticate('signup', authCtrl.localLoginLogic));
+	
+	//sends failure login state back to angular
+	router.get('/failure', authCtrl.failure);
+
 
 	// TWITTER
 	router.get('/twitter', passport.authenticate('twitter'));

@@ -1,3 +1,12 @@
-<div ng-repeat='book in books'>
-    <h1>{{book.name}}</h1>
+<div class="row">
+  <div class="col-sm-6 col-md-4" ng-repeat='book in books'>
+    <div class="thumbnail">
+      <img ng-src="{{book.imgUrl}}" alt="{{book.name}}">
+      <div class="caption">
+        <h3>{{book.name}}</h3>
+        <p>{{book.description}}</p>
+        <p ng-if='book.name'><a href="#" ng-if='book.owner_id != $parent.currentUser()._id' class="btn btn-primary" role="button">Request</a> <a href="#" class="btn btn-danger" role="button" ng-if='book.owner_id == $parent.currentUser()._id' ng-click='deleteBook(book._id, $index)'>Delete</a></p>
+      </div>
+    </div>
+  </div>
 </div>
