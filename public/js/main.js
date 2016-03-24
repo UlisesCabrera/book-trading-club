@@ -62,6 +62,17 @@ module.exports = angular.module('BookPagesModule')
     // will hold all the books
     $scope.books = [];
     
+    $scope.requestStatus = function(user, book){
+        
+        if (user.pendingRequestsToUsers.indexOf(book._id) >= 0) {
+            return 'Requested';
+        } else {
+            return 'Request';
+        }
+          
+    };
+    
+    
     BooksSvc.getAllBooks()
         .then(
             function(res){
@@ -113,6 +124,24 @@ module.exports = angular.module('BookPagesModule')
             );
         }
     };
+    
+    
+    $scope.requestBook = function(book, user) {
+            BooksSvc.requestBook(book, user)
+                .then(
+                 function (res) {
+                     if (res.data.state == 'success'){
+                         window.user = res.data.user;
+                     }
+                     $scope.message = res.data.message;
+                     
+                 },
+                 function(error) {
+          	        $scope.message = 'error getting to the server : ' + error.status + ' ' + error.statusText;
+    	        } 
+            );
+    };
+    
 }]);
 },{}],4:[function(require,module,exports){
 /*global angular*/
@@ -141,6 +170,15 @@ module.exports = angular.module('BookPagesModule', []).service('BooksSvc', ['$ht
             
             this.deleteBook = function(bookId) {
                 return $http.delete('/books/' + bookId);  
+            };
+            
+            this.requestBook = function(book, user){
+                var request = {
+                    user: user,
+                    book : book
+                };
+                
+                return $http.put('/books/', request);
             };
 }]);
 },{}],6:[function(require,module,exports){

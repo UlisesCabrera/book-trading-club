@@ -13,4 +13,13 @@ module.exports = angular.module('BookPagesModule', []).service('BooksSvc', ['$ht
             this.deleteBook = function(bookId) {
                 return $http.delete('/books/' + bookId);  
             };
+            
+            this.requestBook = function(book, user){
+                var request = {
+                    user: user,
+                    book : book
+                };
+                
+                return $http.put('/books/', request);
+            };
 }]);

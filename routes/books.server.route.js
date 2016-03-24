@@ -6,5 +6,7 @@ var booksController = require('../controllers/books.server.controller');
 router.get('/', booksController.sendAllBooks);
 router.post('/', booksController.addNewBook);
 router.delete('/:bookId', booksController.deleteBook);
+router.put('/',  booksController.requestBook);
+
 
 module.exports = router;

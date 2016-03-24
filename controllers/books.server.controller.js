@@ -82,3 +82,75 @@ exports.deleteBook = function (req, res, next){
         
     });  
 };
+
+
+exports.requestBook = function(req, res, next){
+  
+  var bookRequested = req.body.book;
+  var userRequesting = req.body.user;
+  var bookOwner = new ObjectID(bookRequested.owner_id);
+  var userRequestingId = new ObjectID(userRequesting._id);
+  
+  var request = {
+    user : userRequesting,
+    book : bookRequested
+  };
+  
+  MongoClient.connect(process.env.MONGOURI, function(err, db) {
+       assert.equal(err, null, 'Error connecting to the database'); 
+       
+       var users = db.collection('users');
+       
+       // Step1:  check if user already requested book
+       users.find({'_id' : userRequestingId, 'pendingRequestsToUsers' : bookRequested._id}).toArray(function(err, docs){
+           assert.equal(err, null, 'Error checking if user has document');
+           if (docs.length >= 1){
+                res.send({state:'failure', message:'Book already requested'});
+           } else {
+               
+               
+                // Step 2: Notify the owner of the book about the request
+               users.findOneAndUpdate({'_id' :  bookOwner}, {
+                 $push : {
+                   'pendingRequestsFromUsers' : request
+                 }
+                },
+                 function(err, result){
+                   assert.equal(err, null, 'Error requesting to user');
+                   
+                   if (result.ok == 1) {
+                       
+                    // Step 3: Add book to the list of requested books
+                     users.findOneAndUpdate({'_id' :  userRequestingId}, 
+                     {
+                       $push : {
+                         'pendingRequestsToUsers' : bookRequested._id  //to check if book was already requested on the client
+                       }
+                     },
+                     {
+                      returnOriginal: false
+                     }, 
+                     function(err, result){
+                       assert.equal(err, null, 'Error adding to requests list');
+                        if (result.ok == 1) {
+                        // Step4:  Send updated user and response.    
+                          res.send({state:'success', message:'Book Requested', user: result.value});
+                        } else {
+                          res.send({state:'failure', message: 'book was not requested', user: result.value});
+                        }
+                     });
+                    
+                   } else {
+                     res.send({state:'failure', message: 'book was not requested'});
+                   }
+                   
+                });
+           }
+       });
+       
+       
+       
+       
+
+  });
+};
