@@ -18,13 +18,13 @@ angular.module('BookTradingClub', ['ngRoute', 'HomePageModule', 'ProfilePageModu
         templateUrl: 'views/homePage/homePage.html',
         controller: 'HomePageController'
       })
-      .when('/profile/:user', {
-        templateUrl: 'views/profilePage/profilePage.html',
-        controller: 'ProfilePageController'
-      })
       .when('/books',{
         templateUrl: 'views/bookPages/allBooksPage.html',
         controller: 'AllBookPageController'
+      })
+      .when('/profile/:user', {
+        templateUrl: 'views/profilePage/profilePage.html',
+        controller: 'ProfilePageController'
       });
 }).controller('BookTradingClubController',['$scope', 
     function($scope){
@@ -32,7 +32,7 @@ angular.module('BookTradingClub', ['ngRoute', 'HomePageModule', 'ProfilePageModu
             return window.user ? window.user : null;
         };
 }]);
-},{"./bookPages/bookPages.module":2,"./homePage/homePage.module":8,"./profilePage/profilePage.module":10,"angular":14,"angular-route":12,"bootstrap":15,"jquery":28}],2:[function(require,module,exports){
+},{"./bookPages/bookPages.module":2,"./homePage/homePage.module":8,"./profilePage/profilePage.module":11,"angular":16,"angular-route":14,"bootstrap":17,"jquery":30}],2:[function(require,module,exports){
 /*global angular*/
 
 //exports module
@@ -56,6 +56,7 @@ module.exports = angular.module('BookPagesModule')
       imgUrl: '',
       description:'',
       owner_id : '',
+      owner_name:'',
       lenders_id : []
     };
     
@@ -63,13 +64,13 @@ module.exports = angular.module('BookPagesModule')
     $scope.books = [];
     
     $scope.requestStatus = function(user, book){
-        
-        if (user.pendingRequestsToUsers.indexOf(book._id) >= 0) {
-            return 'Requested';
-        } else {
-            return 'Request';
-        }
-          
+       var status = 'request';
+       user.pendingRequestsToUsers.forEach(function(request){
+           if (request.book._id === book._id) {
+                status = 'Requested';
+           } 
+       });
+        return status;    
     };
     
     
@@ -88,8 +89,9 @@ module.exports = angular.module('BookPagesModule')
 	        }              
     );
     
-    $scope.addBook = function(userId) {
-      $scope.newBook.owner_id = userId;
+    $scope.addBook = function(user) {
+      $scope.newBook.owner_id = user._id;
+      $scope.newBook.owner_name = user.name;
       
       BooksSvc.newBook($scope.newBook)
         .then(
@@ -210,19 +212,71 @@ require("./directives/homePage.client.directive");
 /*global angular*/
 
 module.exports = angular.module('ProfilePageModule')
- .controller('ProfilePageController', ['$scope','$routeParams', 
-    function($scope, $routeParams){
-     $scope.user = JSON.parse($routeParams.user);
+ .controller('ProfilePageController', ['$scope','$routeParams', 'ProfileBooksSvc', 
+    function($scope, $routeParams, ProfileBooksSvc){
+
+     ProfileBooksSvc.getUserBooks($routeParams.user)
+      .then(
+       function(res){
+        console.log(res);
+        $scope.myBooks =  res.data.books.ownedBooks;
+        $scope.borrowedBooks = res.data.books.borrowedBooks;
+      }, 
+      function(err){
+        $scope.messageProfile = err;
+      }
+    );
+     
 }]);
 },{}],10:[function(require,module,exports){
+/*global angular*/
+module.exports = angular.module('ProfilePageModule')
+ .directive('myBooksProfile',function(){
+     return {
+         templateUrl: 'views/profilePage/directives/myBooks.profile.html'
+     };
+ }).directive('borrowedBooksProfile',function(){
+     return {
+         templateUrl: 'views/profilePage/directives/borrowedBooks.profile.html'
+     };
+ }).directive('pendingRequestModal',function(){
+     return {
+         templateUrl: 'views/profilePage/directives/pendingRequestsModal.profile.html'
+     };
+ }).directive('proposedRequestModal',function(){
+     return {
+         templateUrl: 'views/profilePage/directives/proposedRequestsModal.profile.html'
+     };
+ })
+},{}],11:[function(require,module,exports){
 /*global angular*/
 
 //exports module
 module.exports = angular.module('ProfilePageModule',[]);
 
 // require all controllers, services, directives
+require("./services/profilePage.client.service");
 require("./controllers/profilePage.client.controller");
-},{"./controllers/profilePage.client.controller":9}],11:[function(require,module,exports){
+require("./directives/profilePage.client.directive");
+},{"./controllers/profilePage.client.controller":9,"./directives/profilePage.client.directive":10,"./services/profilePage.client.service":12}],12:[function(require,module,exports){
+/*global angular*/
+module.exports = angular.module('ProfilePageModule', []).service('ProfileBooksSvc', ['$http', function($http) {
+            
+            this.getUserBooks = function(userId){
+                return $http.get('/books/' + userId );  
+            };
+            
+            // creates new book
+            this.newBook = function(newBook) {
+                return $http.post('/books', newBook);
+            };
+            
+            this.deleteBook = function(bookId) {
+                return $http.delete('/books/' + bookId);  
+            };
+            
+}]);
+},{}],13:[function(require,module,exports){
 /**
  * @license AngularJS v1.5.2
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -1246,11 +1300,11 @@ function ngViewFillContentFactory($compile, $controller, $route) {
 
 })(window, window.angular);
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 require('./angular-route');
 module.exports = 'ngRoute';
 
-},{"./angular-route":11}],13:[function(require,module,exports){
+},{"./angular-route":13}],15:[function(require,module,exports){
 /**
  * @license AngularJS v1.5.1
  * (c) 2010-2016 Google, Inc. http://angularjs.org
@@ -31820,11 +31874,11 @@ $provide.value("$locale", {
 })(window, document);
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 require('./angular');
 module.exports = angular;
 
-},{"./angular":13}],15:[function(require,module,exports){
+},{"./angular":15}],17:[function(require,module,exports){
 // This file is autogenerated via the `commonjs` Grunt task. You can require() this file in a CommonJS environment.
 require('../../js/transition.js')
 require('../../js/alert.js')
@@ -31838,7 +31892,7 @@ require('../../js/popover.js')
 require('../../js/scrollspy.js')
 require('../../js/tab.js')
 require('../../js/affix.js')
-},{"../../js/affix.js":16,"../../js/alert.js":17,"../../js/button.js":18,"../../js/carousel.js":19,"../../js/collapse.js":20,"../../js/dropdown.js":21,"../../js/modal.js":22,"../../js/popover.js":23,"../../js/scrollspy.js":24,"../../js/tab.js":25,"../../js/tooltip.js":26,"../../js/transition.js":27}],16:[function(require,module,exports){
+},{"../../js/affix.js":18,"../../js/alert.js":19,"../../js/button.js":20,"../../js/carousel.js":21,"../../js/collapse.js":22,"../../js/dropdown.js":23,"../../js/modal.js":24,"../../js/popover.js":25,"../../js/scrollspy.js":26,"../../js/tab.js":27,"../../js/tooltip.js":28,"../../js/transition.js":29}],18:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: affix.js v3.3.6
  * http://getbootstrap.com/javascript/#affix
@@ -32002,7 +32056,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: alert.js v3.3.6
  * http://getbootstrap.com/javascript/#alerts
@@ -32098,7 +32152,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: button.js v3.3.6
  * http://getbootstrap.com/javascript/#buttons
@@ -32220,7 +32274,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: carousel.js v3.3.6
  * http://getbootstrap.com/javascript/#carousel
@@ -32459,7 +32513,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: collapse.js v3.3.6
  * http://getbootstrap.com/javascript/#collapse
@@ -32672,7 +32726,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: dropdown.js v3.3.6
  * http://getbootstrap.com/javascript/#dropdowns
@@ -32839,7 +32893,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: modal.js v3.3.6
  * http://getbootstrap.com/javascript/#modals
@@ -33178,7 +33232,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: popover.js v3.3.6
  * http://getbootstrap.com/javascript/#popovers
@@ -33288,7 +33342,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.6
  * http://getbootstrap.com/javascript/#scrollspy
@@ -33462,7 +33516,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tab.js v3.3.6
  * http://getbootstrap.com/javascript/#tabs
@@ -33619,7 +33673,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: tooltip.js v3.3.6
  * http://getbootstrap.com/javascript/#tooltip
@@ -34135,7 +34189,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /* ========================================================================
  * Bootstrap: transition.js v3.3.6
  * http://getbootstrap.com/javascript/#transitions
@@ -34196,7 +34250,7 @@ require('../../js/affix.js')
 
 }(jQuery);
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.2
  * http://jquery.com/

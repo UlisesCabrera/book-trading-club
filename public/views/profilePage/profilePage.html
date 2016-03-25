@@ -1,1 +1,29 @@
-<p>{{ user.name }}</p>
+
+<div class='row'>
+    <div class='col-xs-12'>
+        <div class="jumbotron">
+          <h1>Hello, {{ $parent.currentUser().name }}</h1>
+          <button class="btn btn-primary" type="button"  data-toggle="modal" data-target="#pendingRequests">
+              Pending Requests <span class="badge">{{$parent.currentUser().pendingRequestsFromUsers.length}}</span>
+           </button>
+           <button class="btn btn-info" type="button" data-toggle="modal" data-target="#proposedRequests">
+              Proposed Requests <span class="badge">{{$parent.currentUser().pendingRequestsToUsers.length}}</span>
+           </button>
+        </div>
+    </div>
+</div>
+
+<my-books-profile></my-books-profile>
+<borrowed-books-profile></borrowed-books-profile>
+<pending-request-modal></pending-request-modal>
+<proposed-request-modal></proposed-request-modal>
+
+
+
+
+
+
+
+
+
+

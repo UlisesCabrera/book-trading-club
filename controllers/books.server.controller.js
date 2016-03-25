@@ -56,6 +56,59 @@ exports.sendAllBooks = function(req, res, next){
     
 };
 
+
+exports.sendUserBooks = function(req,res,next) { 
+    var allBooks = {
+        ownedBooks : null,
+        borrowedBooks : null
+    };
+    
+    var userId = req.params.userId;
+    console.log(userId);
+    
+    //connecting to the database
+    MongoClient.connect(process.env.MONGOURI, function(err, db){
+        assert.equal(err, null, 'Error occured while connecting to the database');
+        var books = db.collection('books');
+        
+        
+        // sends books to client
+        books.find({'owner_id' : userId }).toArray(function(err, ownedBooks){
+          assert.equal(err, null,'Error finding owned books');
+          
+          if (ownedBooks.length >= 1) {
+            allBooks.ownedBooks = ownedBooks;
+            
+            books.find({'lenders_id' : userId }).toArray(function(err, borrowedBooks){
+               assert.equal(err, null,'Error finding borrowed books');
+               if (borrowedBooks.length >= 1) {
+                allBooks.borrowedBooks = borrowedBooks;
+                
+                //send owned and borrowed books
+                res.send({state:'success', books: allBooks, message:'All Books found'});
+               } 
+               
+               else {
+                res.send({state:'success', books: allBooks, message:'only owned books found'});  
+               }
+            });
+            
+          } 
+          else {
+            res.send({state:'failure', books: null, message:'Error finding owned books'});
+          }
+            
+        });
+       
+        
+    });
+}; 
+
+
+
+
+
+
 exports.deleteBook = function (req, res, next){
     MongoClient.connect(process.env.MONGOURI, function(err, db) {
         
@@ -96,6 +149,14 @@ exports.requestBook = function(req, res, next){
     book : bookRequested
   };
   
+  var proposedRequest = {
+    status: 'pending',
+    book : bookRequested,
+    reasonForDecline: ''
+  };
+  
+ 
+  
   MongoClient.connect(process.env.MONGOURI, function(err, db) {
        assert.equal(err, null, 'Error connecting to the database'); 
        
@@ -124,7 +185,7 @@ exports.requestBook = function(req, res, next){
                      users.findOneAndUpdate({'_id' :  userRequestingId}, 
                      {
                        $push : {
-                         'pendingRequestsToUsers' : bookRequested._id  //to check if book was already requested on the client
+                         'pendingRequestsToUsers' : proposedRequest  //to check if book was already requested on the client
                        }
                      },
                      {

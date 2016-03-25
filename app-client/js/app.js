@@ -17,13 +17,13 @@ angular.module('BookTradingClub', ['ngRoute', 'HomePageModule', 'ProfilePageModu
         templateUrl: 'views/homePage/homePage.html',
         controller: 'HomePageController'
       })
-      .when('/profile/:user', {
-        templateUrl: 'views/profilePage/profilePage.html',
-        controller: 'ProfilePageController'
-      })
       .when('/books',{
         templateUrl: 'views/bookPages/allBooksPage.html',
         controller: 'AllBookPageController'
+      })
+      .when('/profile/:user', {
+        templateUrl: 'views/profilePage/profilePage.html',
+        controller: 'ProfilePageController'
       });
 }).controller('BookTradingClubController',['$scope', 
     function($scope){

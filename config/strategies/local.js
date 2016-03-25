@@ -54,8 +54,7 @@ module.exports = function (passport, db) {
                           myBooksIDs : [],
                           booksBorrowedId : [],
                           pendingRequestsFromUsers : [],
-                          pendingRequestsToUsers : [],
-                          messageFromUsers:[]
+                          pendingRequestsToUsers : []
                         };
                         usersCollection.insertOne(newUser, function(err, result){
                               assert.equal(err, null,'error inserting user');

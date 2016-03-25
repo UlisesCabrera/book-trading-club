@@ -20,7 +20,7 @@
           <a  href='/auth/signout' class="btn btn-default navbar-btn" ng-show='currentUser()' >Sign out</a>
       
           <ul class="nav navbar-nav navbar-right">
-            <li><a  href='#/profile/{{ currentUser() }}' ng-show='currentUser()'>Profile</a></li>
+            <li><a  href='#/profile/{{ currentUser()._id }}' ng-show='currentUser()'>Profile</a></li>
             <li><a href='#/'>Home</a></li>
             <li><a href='#/books' ng-show='currentUser()'>All Books</a></li>
           </ul>
@@ -92,9 +92,10 @@
           </div>
         </div>
       </div>
-    </div>    
-  <ng-view></ng-view>
-  
+    </div>
+    <div class='container'>
+      <ng-view></ng-view>
+    </div>
   <script type="text/javascript">
 	  
 	  // fix the facebook url bug

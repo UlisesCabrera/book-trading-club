@@ -11,6 +11,7 @@ module.exports = angular.module('BookPagesModule')
       imgUrl: '',
       description:'',
       owner_id : '',
+      owner_name:'',
       lenders_id : []
     };
     
@@ -18,13 +19,13 @@ module.exports = angular.module('BookPagesModule')
     $scope.books = [];
     
     $scope.requestStatus = function(user, book){
-        
-        if (user.pendingRequestsToUsers.indexOf(book._id) >= 0) {
-            return 'Requested';
-        } else {
-            return 'Request';
-        }
-          
+       var status = 'request';
+       user.pendingRequestsToUsers.forEach(function(request){
+           if (request.book._id === book._id) {
+                status = 'Requested';
+           } 
+       });
+        return status;    
     };
     
     
@@ -43,8 +44,9 @@ module.exports = angular.module('BookPagesModule')
 	        }              
     );
     
-    $scope.addBook = function(userId) {
-      $scope.newBook.owner_id = userId;
+    $scope.addBook = function(user) {
+      $scope.newBook.owner_id = user._id;
+      $scope.newBook.owner_name = user.name;
       
       BooksSvc.newBook($scope.newBook)
         .then(
