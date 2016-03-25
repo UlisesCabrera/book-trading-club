@@ -74,6 +74,10 @@ module.exports = angular.module('BookPagesModule')
                status = 'Borrowed';
            }
            
+           if (request.status === 'declined' && request.book._id === book._id){
+               status = 'Declined';
+           }
+           
        });
         return status;    
     };
@@ -250,6 +254,24 @@ module.exports = angular.module('ProfilePageModule')
        );
     };
     
+    $scope.declineRequest = function(request, requestId){
+     ProfileBooksSvc.declineRequest(request)
+      .then(function(res){
+        if (res.data.state == 'success'){
+          window.user.pendingRequestsFromUsers.forEach(function(requests, idx){
+              if (requests.book._id == requestId) {
+                window.user.pendingRequestsFromUsers.splice(idx, 1);
+              }
+          });
+        }
+        
+      },
+         function(err){
+          $scope.messageProfile = err;
+         }
+       );
+    };    
+    
      
 }]);
 },{}],10:[function(require,module,exports){
@@ -292,6 +314,10 @@ module.exports = angular.module('ProfilePageModule', []).service('ProfileBooksSv
             
             this.acceptRequest = function(request){
                 return $http.put('/profile/accept', request);
+            };
+            
+            this.declineRequest = function(request){
+                return $http.put('/profile/decline', request);
             };
             
             // creates new book

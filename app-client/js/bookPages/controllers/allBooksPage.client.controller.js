@@ -29,6 +29,10 @@ module.exports = angular.module('BookPagesModule')
                status = 'Borrowed';
            }
            
+           if (request.status === 'declined' && request.book._id === book._id){
+               status = 'Declined';
+           }
+           
        });
         return status;    
     };

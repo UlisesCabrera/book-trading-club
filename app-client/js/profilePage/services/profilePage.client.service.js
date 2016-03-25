@@ -9,6 +9,10 @@ module.exports = angular.module('ProfilePageModule', []).service('ProfileBooksSv
                 return $http.put('/profile/accept', request);
             };
             
+            this.declineRequest = function(request){
+                return $http.put('/profile/decline', request);
+            };
+            
             // creates new book
             this.newBook = function(newBook) {
                 return $http.post('/books', newBook);

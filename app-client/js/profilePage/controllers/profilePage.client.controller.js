@@ -34,5 +34,23 @@ module.exports = angular.module('ProfilePageModule')
        );
     };
     
+    $scope.declineRequest = function(request, requestId){
+     ProfileBooksSvc.declineRequest(request)
+      .then(function(res){
+        if (res.data.state == 'success'){
+          window.user.pendingRequestsFromUsers.forEach(function(requests, idx){
+              if (requests.book._id == requestId) {
+                window.user.pendingRequestsFromUsers.splice(idx, 1);
+              }
+          });
+        }
+        
+      },
+         function(err){
+          $scope.messageProfile = err;
+         }
+       );
+    };    
+    
      
 }]);

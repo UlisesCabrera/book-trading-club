@@ -29,7 +29,7 @@ exports.acceptRequest = function(req,res,next){
            assert.equal(err, null, 'Error adding to user to book lender list');
            
            if (result1.ok == 1) {
-               //Step3: set status to approved on requestor peding request to users status
+               //Step3: set status to approved on requestor pending request to users status
                users.findOneAndUpdate({'_id' : userRequestingId, 'pendingRequestsToUsers.book._id' : req.body.book._id}, {
                    "$set" : {
                        'pendingRequestsToUsers.$.status' : 'approved'
@@ -72,8 +72,55 @@ exports.acceptRequest = function(req,res,next){
 
 
 exports.declineRequest = function(req,res,next){
+  
+  //Step1: Grab all the required ids, book request, book owner and user requesting
+  var bookOwnerId = new ObjectID(req.body.book.owner_id);
+  var userRequestingId = new ObjectID(req.body.user._id);
+  
+
+  MongoClient.connect(process.env.MONGOURI, function(err, db) {
+       assert.equal(err, null, 'Error connecting to the database'); 
+       
+       var users = db.collection('users');
+       
+       //Step2: set status to declined on requestor pending request to users status
+               users.findOneAndUpdate({'_id' : userRequestingId, 'pendingRequestsToUsers.book._id' : req.body.book._id}, {
+                   "$set" : {
+                       'pendingRequestsToUsers.$.status' : 'declined'
+                   }
+               }, function(err, result2){
+                   assert.equal(err, null, 'Error approving request on user requesting');
+                   
+                   if (result2.ok == 1){
+                       // step4: remove request from pending request from user array
+                       users.findOneAndUpdate(
+                           {'_id' : bookOwnerId}, 
+                           {
+                           "$pull" : { "pendingRequestsFromUsers" : { "book._id" : req.body.book._id }}
+                           },
+                       {
+                          returnOriginal: false
+                       }, function(err, result3) {
+                          assert.equal(err, null, 'Error error removing from pending request list');
+                          
+                          if (result3.ok == 1) {
+                              //send response to client
+                              res.send({state:'success', message:'request denied'});
+                          } else {
+                              res.send({state:'failure'});
+                          }
+                       }
+                       );
+                   } else {
+                      res.send({state:'failure'});
+                    }
+               });    
+  });    
+    
     
 };
+
+
 
 exports.cancelRequest = function(req,res,next){
     
