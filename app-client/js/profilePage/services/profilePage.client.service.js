@@ -5,6 +5,10 @@ module.exports = angular.module('ProfilePageModule', []).service('ProfileBooksSv
                 return $http.get('/books/' + userId );  
             };
             
+            this.acceptRequest = function(request){
+                return $http.put('/profile/accept', request);
+            };
+            
             // creates new book
             this.newBook = function(newBook) {
                 return $http.post('/books', newBook);

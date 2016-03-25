@@ -28,7 +28,6 @@ module.exports = function(passport, db) {
               city: '',
               state: '',
               myBooksIDs : [],
-              booksBorrowedId : [],
               pendingRequestsFromUsers : [],
               pendingRequestsToUsers : []
             };

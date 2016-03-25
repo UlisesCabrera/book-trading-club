@@ -68,7 +68,12 @@ module.exports = angular.module('BookPagesModule')
        user.pendingRequestsToUsers.forEach(function(request){
            if (request.book._id === book._id) {
                 status = 'Requested';
-           } 
+           }
+           
+           if (request.status === 'approved' && request.book._id === book._id){
+               status = 'Borrowed';
+           }
+           
        });
         return status;    
     };
@@ -226,6 +231,25 @@ module.exports = angular.module('ProfilePageModule')
         $scope.messageProfile = err;
       }
     );
+    
+    $scope.acceptRequest = function(request, requestId){
+     ProfileBooksSvc.acceptRequest(request)
+      .then(function(res){
+        if (res.data.state == 'success'){
+          window.user.pendingRequestsFromUsers.forEach(function(requests, idx){
+              if (requests.book._id == requestId) {
+                window.user.pendingRequestsFromUsers.splice(idx, 1);
+              }
+          });
+        }
+        
+      },
+         function(err){
+          $scope.messageProfile = err;
+         }
+       );
+    };
+    
      
 }]);
 },{}],10:[function(require,module,exports){
@@ -264,6 +288,10 @@ module.exports = angular.module('ProfilePageModule', []).service('ProfileBooksSv
             
             this.getUserBooks = function(userId){
                 return $http.get('/books/' + userId );  
+            };
+            
+            this.acceptRequest = function(request){
+                return $http.put('/profile/accept', request);
             };
             
             // creates new book

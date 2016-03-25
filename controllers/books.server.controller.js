@@ -104,11 +104,6 @@ exports.sendUserBooks = function(req,res,next) {
     });
 }; 
 
-
-
-
-
-
 exports.deleteBook = function (req, res, next){
     MongoClient.connect(process.env.MONGOURI, function(err, db) {
         
@@ -208,10 +203,5 @@ exports.requestBook = function(req, res, next){
                 });
            }
        });
-       
-       
-       
-       
-
   });
 };

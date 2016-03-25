@@ -15,6 +15,7 @@ var session = require('express-session');
 
 var index = require('./routes/index.server.route');
 var booksRoute = require('./routes/books.server.route');
+var profileRoute = require('./routes/profile.server.route');
 var authRoute = require('./routes/auth.server.route')(passport);
 
 var app = express();
@@ -44,6 +45,7 @@ app.use(passport.session());
 app.use('/', index);
 app.use('/auth', authRoute);
 app.use('/books', booksRoute);
+app.use('/profile', profileRoute);
 
 // initialize passport
 var initPassport = require('./config/passport-init');

@@ -23,7 +23,12 @@ module.exports = angular.module('BookPagesModule')
        user.pendingRequestsToUsers.forEach(function(request){
            if (request.book._id === book._id) {
                 status = 'Requested';
-           } 
+           }
+           
+           if (request.status === 'approved' && request.book._id === book._id){
+               status = 'Borrowed';
+           }
+           
        });
         return status;    
     };

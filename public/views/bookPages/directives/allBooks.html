@@ -8,7 +8,7 @@
         <p ng-if='book.name'>
         <button ng-if='book.owner_id != $parent.currentUser()._id' 
                 class="btn btn-primary" role="button" 
-                ng-click='requestBook(book, $parent.currentUser())' ng-disabled="requestStatus($parent.currentUser(), book) == 'Requested'">{{ requestStatus($parent.currentUser(), book)}}</button> 
+                ng-click='requestBook(book, $parent.currentUser())' ng-disabled="requestStatus($parent.currentUser(), book) == 'Requested' || requestStatus($parent.currentUser(), book) == 'Borrowed'">{{ requestStatus($parent.currentUser(), book)}}</button> 
         <button class="btn btn-danger" 
                 role="button" 
                 ng-if='book.owner_id == $parent.currentUser()._id' 
