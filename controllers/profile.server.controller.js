@@ -183,6 +183,22 @@ exports.returnBook = function(req, res, next) {
          var books = db.collection('books');
          var users = db.collection('users');
          
+         
+         // if this is the last user returning the book, set the return to owner field to false;
+         if (req.body.lenders_id.length == 1) {
+            books.findOneAndUpdate({'_id' : bookBorrowedId},{
+               '$set' : {returnBookToOnwer : false} 
+            }, {
+                upsert: true
+            }, function(err, result0){
+                assert.equal(err, null, 'error setting return to owner false');
+                assert.equal(result0.ok, 1,'error while completing setting the return to owner to false');
+                
+            }); 
+         }
+         
+         
+         
          //Step2: remove user from the books lenders id
          books.findOneAndUpdate({'_id' : bookBorrowedId},
             {
@@ -193,7 +209,7 @@ exports.returnBook = function(req, res, next) {
                }, function(err, result1) {
                 assert.equal(err, null, 'error removing user id from lenders id');
                 if (result1.ok == 1) {
-                    //Step3: set status to returned on requestor pending request to users status
+                   //Step3: set status to returned on requestor pending request to users status
                    users.findOneAndUpdate({'_id' : userReturningBook, 'pendingRequestsToUsers.book._id' : req.body._id}, {
                        "$set" : {
                            'pendingRequestsToUsers.$.status' : 'Returned'
@@ -214,4 +230,31 @@ exports.returnBook = function(req, res, next) {
          
       });
       
+};
+
+exports.requestBookBack = function (req, res, next) {
+    var bookId = new ObjectID(req.body._id);
+    
+    MongoClient.connect(process.env.MONGOURI, function(err, db){
+       assert.equal(err, null, 'error connecting to the database'); 
+       var books = db.collection('books');
+       
+       books.findOneAndUpdate({'_id': bookId}, {
+           '$set': {
+               returnBookToOnwer : true
+           }
+       }, {
+           upsert: true
+       }, function(err, result){
+           assert.equal(err, null, 'Error requesting book back');
+           if (result.ok == 1){
+               res.send({state:'success', message:'book requested back'});
+           } else {
+               res.send({state: 'failure', message: 'book not requested back'});
+           }
+       });
+        
+        
+    });
+    
 };

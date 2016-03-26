@@ -3,10 +3,10 @@
     <div class='col-xs-12'>
         <div class="jumbotron">
           <h1>Hello, {{ $parent.currentUser().name }}</h1>
-          <button class="btn btn-primary" type="button"  data-toggle="modal" data-target="#pendingRequests">
+          <button ng-disabled='$parent.currentUser().pendingRequestsFromUsers.length == 0' class="btn btn-primary" type="button"  data-toggle="modal" data-target="#pendingRequests">
               Pending Requests <span class="badge">{{$parent.currentUser().pendingRequestsFromUsers.length}}</span>
            </button>
-           <button class="btn btn-info" type="button" data-toggle="modal" data-target="#proposedRequests">
+           <button ng-disabled='$parent.currentUser().pendingRequestsToUsers.length == 0' class="btn btn-info" type="button" data-toggle="modal" data-target="#proposedRequests">
               Proposed Requests <span class="badge">{{$parent.currentUser().pendingRequestsToUsers.length}}</span>
            </button>
         </div>

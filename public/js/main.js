@@ -57,7 +57,8 @@ module.exports = angular.module('BookPagesModule')
       description:'',
       owner_id : '',
       owner_name:'',
-      lenders_id : []
+      lenders_id : [],
+      returnBookToOnwer: false
     };
     
     // will hold all the books
@@ -248,6 +249,7 @@ module.exports = angular.module('ProfilePageModule')
       }
     );
     
+    //TODO: update client when accepting the book, so it shows that its borrowed by someone. 
     $scope.acceptRequest = function(request, requestId){
      if (confirm('if you accept you will not be able to delete the book until the book is returned, is that ok?')) {
        ProfileBooksSvc.acceptRequest(request)
@@ -327,6 +329,23 @@ module.exports = angular.module('ProfilePageModule')
         );
     };
     
+    $scope.requestBookBack = function(book) {
+      ProfileBooksSvc.requestBookBack(book)
+      .then(function(res){
+         if (res.data.state == 'success'){
+           $scope.myBooks.forEach(function(myBook, idx){
+               if (myBook._id == book._id ) {
+                 $scope.myBooks[idx].returnBookToOnwer = true;
+               }
+           });
+         }
+         
+       },
+          function(err){
+           $scope.messageProfile = err;
+          }
+        );
+    };
 }]);
 },{}],10:[function(require,module,exports){
 /*global angular*/
@@ -380,6 +399,10 @@ module.exports = angular.module('ProfilePageModule', []).service('ProfileBooksSv
             
             this.returnBook = function(book){
                 return $http.put('/profile/return', book);
+            };
+            
+            this.requestBookBack = function(book){
+                return $http.put('/profile/requestBookBack', book);
             };
             
             // creates new book

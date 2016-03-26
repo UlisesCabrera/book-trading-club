@@ -24,6 +24,7 @@ module.exports = angular.module('ProfilePageModule')
       }
     );
     
+    //TODO: update client when accepting the book, so it shows that its borrowed by someone. 
     $scope.acceptRequest = function(request, requestId){
      if (confirm('if you accept you will not be able to delete the book until the book is returned, is that ok?')) {
        ProfileBooksSvc.acceptRequest(request)
@@ -103,4 +104,21 @@ module.exports = angular.module('ProfilePageModule')
         );
     };
     
+    $scope.requestBookBack = function(book) {
+      ProfileBooksSvc.requestBookBack(book)
+      .then(function(res){
+         if (res.data.state == 'success'){
+           $scope.myBooks.forEach(function(myBook, idx){
+               if (myBook._id == book._id ) {
+                 $scope.myBooks[idx].returnBookToOnwer = true;
+               }
+           });
+         }
+         
+       },
+          function(err){
+           $scope.messageProfile = err;
+          }
+        );
+    };
 }]);

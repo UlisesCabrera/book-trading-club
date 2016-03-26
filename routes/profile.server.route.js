@@ -6,5 +6,6 @@ router.put('/accept',  profileController.acceptRequest);
 router.put('/decline',  profileController.declineRequest);
 router.put('/cancel',  profileController.cancelRequest);
 router.put('/return',  profileController.returnBook);
+router.put('/requestBookBack',  profileController.requestBookBack);
 
 module.exports = router;

@@ -12,7 +12,8 @@ module.exports = angular.module('BookPagesModule')
       description:'',
       owner_id : '',
       owner_name:'',
-      lenders_id : []
+      lenders_id : [],
+      returnBookToOnwer: false
     };
     
     // will hold all the books

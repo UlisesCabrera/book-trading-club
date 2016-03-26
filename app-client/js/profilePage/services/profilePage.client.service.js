@@ -21,6 +21,10 @@ module.exports = angular.module('ProfilePageModule', []).service('ProfileBooksSv
                 return $http.put('/profile/return', book);
             };
             
+            this.requestBookBack = function(book){
+                return $http.put('/profile/requestBookBack', book);
+            };
+            
             // creates new book
             this.newBook = function(newBook) {
                 return $http.post('/books', newBook);
