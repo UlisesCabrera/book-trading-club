@@ -3,10 +3,15 @@
       <h3>Books Borrowed: </h3>
     </div>
     <div class='col-xs-12'>    
-       <ul>
-          <li ng-repeat='book in borrowedBooks'>
-              {{book.name}}
-          </li>
-      </ul>
+        <div class="col-xs-4" ng-repeat='book in borrowedBooks'>
+            <div class="thumbnail">
+              <img ng-src="{{ book.imgUrl }}" alt="{{ book.name }}">
+              <div class="caption">
+                <h4>{{ book.name }}</h4>
+                <p><strong>Owner:</strong> <br>{{ book.owner_name}} </p>
+                <buttton class="btn btn-block btn-warning" role="button" ng-click='returnBook(book)'>Return</button>
+              </div>
+            </div>
+          </div>      
     </div>
 </div>

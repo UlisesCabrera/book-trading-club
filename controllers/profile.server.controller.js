@@ -171,3 +171,47 @@ exports.cancelRequest = function(req,res,next){
   }); 
     
 };
+
+exports.returnBook = function(req, res, next) {
+      //Step1: Grab all the required ids
+      var bookBorrowedId = new ObjectID(req.body._id);
+      var userReturningBook =  new ObjectID(req.user._id);
+      
+      MongoClient.connect(process.env.MONGOURI, function(err, db) {
+         assert.equal(err, null, 'Error connecting to the database');
+         
+         var books = db.collection('books');
+         var users = db.collection('users');
+         
+         //Step2: remove user from the books lenders id
+         books.findOneAndUpdate({'_id' : bookBorrowedId},
+            {
+                "$pull" : { 'lenders_id' : String(req.user._id)}
+            },
+               {
+                  returnOriginal: false
+               }, function(err, result1) {
+                assert.equal(err, null, 'error removing user id from lenders id');
+                if (result1.ok == 1) {
+                    //Step3: set status to returned on requestor pending request to users status
+                   users.findOneAndUpdate({'_id' : userReturningBook, 'pendingRequestsToUsers.book._id' : req.body._id}, {
+                       "$set" : {
+                           'pendingRequestsToUsers.$.status' : 'Returned'
+                       }
+                   },function(err, result2){
+                       if (result2.ok == 1) {
+                           assert.equal(err, null, 'Error setting status to returned');
+                           res.send({state:'success', message: 'book returned'});
+                       } else {
+                          res.send({state: 'failure' , message: 'error returning the book'}); 
+                       }
+                   });
+                } else {
+                    res.send({state: 'failure' , message: 'error returning the book'});
+                }
+            }
+         );
+         
+      });
+      
+};

@@ -25,21 +25,23 @@ module.exports = angular.module('ProfilePageModule')
     );
     
     $scope.acceptRequest = function(request, requestId){
-     ProfileBooksSvc.acceptRequest(request)
-      .then(function(res){
-        if (res.data.state == 'success'){
-          window.user.pendingRequestsFromUsers.forEach(function(requests, idx){
-              if (requests.book._id == requestId) {
-                window.user.pendingRequestsFromUsers.splice(idx, 1);
-              }
-          });
-        }
-        
-      },
-         function(err){
-          $scope.messageProfile = err;
-         }
-       );
+     if (confirm('if you accept you will not be able to delete the book until the book is returned, is that ok?')) {
+       ProfileBooksSvc.acceptRequest(request)
+        .then(function(res){
+          if (res.data.state == 'success'){
+            window.user.pendingRequestsFromUsers.forEach(function(requests, idx){
+                if (requests.book._id == requestId) {
+                  window.user.pendingRequestsFromUsers.splice(idx, 1);
+                }
+            });
+          }
+          
+        },
+           function(err){
+            $scope.messageProfile = err;
+           }
+         );
+     }
     };
     
     $scope.declineRequest = function(request, requestId){
@@ -78,5 +80,27 @@ module.exports = angular.module('ProfilePageModule')
         );
     };
     
-     
+    $scope.returnBook = function(book) {
+      ProfileBooksSvc.returnBook(book)
+      .then(function(res){
+         if (res.data.state == 'success'){
+           $scope.borrowedBooks.forEach(function(borrowedBook, idx){
+               if (borrowedBook._id == book._id ) {
+                 $scope.borrowedBooks.splice(idx, 1);
+                 window.user.pendingRequestsToUsers.forEach(function(requests, idx){
+                  if (requests.book._id == book._id ) {
+                    window.user.pendingRequestsToUsers[idx].status = 'Returned';
+                  }
+                });
+               }
+           });
+         }
+         
+       },
+          function(err){
+           $scope.messageProfile = err;
+          }
+        );
+    };
+    
 }]);

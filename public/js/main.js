@@ -66,8 +66,12 @@ module.exports = angular.module('BookPagesModule')
     $scope.requestStatus = function(user, book){
        var status = 'request';
        user.pendingRequestsToUsers.forEach(function(request){
-           if (request.book._id === book._id) {
-                status = 'Requested';
+           if (request.status === 'Returned') {
+                status = 'Request';
+           }
+           
+           if (request.status === 'pending' && request.book._id === book._id){
+               status = 'Requested';
            }
            
            if (request.status === 'approved' && request.book._id === book._id){
@@ -77,7 +81,7 @@ module.exports = angular.module('BookPagesModule')
            if (request.status === 'declined' && request.book._id === book._id){
                status = 'Declined';
            }
-           
+
        });
         return status;    
     };
@@ -245,21 +249,23 @@ module.exports = angular.module('ProfilePageModule')
     );
     
     $scope.acceptRequest = function(request, requestId){
-     ProfileBooksSvc.acceptRequest(request)
-      .then(function(res){
-        if (res.data.state == 'success'){
-          window.user.pendingRequestsFromUsers.forEach(function(requests, idx){
-              if (requests.book._id == requestId) {
-                window.user.pendingRequestsFromUsers.splice(idx, 1);
-              }
-          });
-        }
-        
-      },
-         function(err){
-          $scope.messageProfile = err;
-         }
-       );
+     if (confirm('if you accept you will not be able to delete the book until the book is returned, is that ok?')) {
+       ProfileBooksSvc.acceptRequest(request)
+        .then(function(res){
+          if (res.data.state == 'success'){
+            window.user.pendingRequestsFromUsers.forEach(function(requests, idx){
+                if (requests.book._id == requestId) {
+                  window.user.pendingRequestsFromUsers.splice(idx, 1);
+                }
+            });
+          }
+          
+        },
+           function(err){
+            $scope.messageProfile = err;
+           }
+         );
+     }
     };
     
     $scope.declineRequest = function(request, requestId){
@@ -298,7 +304,29 @@ module.exports = angular.module('ProfilePageModule')
         );
     };
     
-     
+    $scope.returnBook = function(book) {
+      ProfileBooksSvc.returnBook(book)
+      .then(function(res){
+         if (res.data.state == 'success'){
+           $scope.borrowedBooks.forEach(function(borrowedBook, idx){
+               if (borrowedBook._id == book._id ) {
+                 $scope.borrowedBooks.splice(idx, 1);
+                 window.user.pendingRequestsToUsers.forEach(function(requests, idx){
+                  if (requests.book._id == book._id ) {
+                    window.user.pendingRequestsToUsers[idx].status = 'Returned';
+                  }
+                });
+               }
+           });
+         }
+         
+       },
+          function(err){
+           $scope.messageProfile = err;
+          }
+        );
+    };
+    
 }]);
 },{}],10:[function(require,module,exports){
 /*global angular*/
@@ -348,6 +376,10 @@ module.exports = angular.module('ProfilePageModule', []).service('ProfileBooksSv
             
             this.cancelRequest = function(request){
                 return $http.put('/profile/cancel', request);
+            };
+            
+            this.returnBook = function(book){
+                return $http.put('/profile/return', book);
             };
             
             // creates new book

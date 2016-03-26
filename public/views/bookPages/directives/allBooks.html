@@ -13,7 +13,7 @@
         <button class="btn btn-danger" 
                 role="button" 
                 ng-if='book.owner_id == $parent.currentUser()._id' 
-                ng-click='deleteBook(book._id, $index)'>Delete</button></p>
+                ng-click='deleteBook(book._id, $index)' ng-disabled='book.lenders_id.length > 0'>{{ book.lenders_id.length > 0 ? 'Lended' : 'Delete' }}</button></p>
       </div>
     </div>
   </div>

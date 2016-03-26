@@ -21,8 +21,12 @@ module.exports = angular.module('BookPagesModule')
     $scope.requestStatus = function(user, book){
        var status = 'request';
        user.pendingRequestsToUsers.forEach(function(request){
-           if (request.book._id === book._id) {
-                status = 'Requested';
+           if (request.status === 'Returned') {
+                status = 'Request';
+           }
+           
+           if (request.status === 'pending' && request.book._id === book._id){
+               status = 'Requested';
            }
            
            if (request.status === 'approved' && request.book._id === book._id){
@@ -32,7 +36,7 @@ module.exports = angular.module('BookPagesModule')
            if (request.status === 'declined' && request.book._id === book._id){
                status = 'Declined';
            }
-           
+
        });
         return status;    
     };
