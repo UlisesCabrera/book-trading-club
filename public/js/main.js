@@ -224,6 +224,14 @@ module.exports = angular.module('ProfilePageModule')
  .controller('ProfilePageController', ['$scope','$routeParams', 'ProfileBooksSvc', 
     function($scope, $routeParams, ProfileBooksSvc){
 
+     $scope.removeOrCancel = function(request) {
+        if (request.status == 'pending'){
+         return 'Cancel';
+        } else {
+         return 'Remove';
+        }
+     };
+
      ProfileBooksSvc.getUserBooks($routeParams.user)
       .then(
        function(res){
@@ -270,7 +278,25 @@ module.exports = angular.module('ProfilePageModule')
           $scope.messageProfile = err;
          }
        );
-    };    
+    };
+    
+    $scope.cancelRequest = function(request) {
+      ProfileBooksSvc.cancelRequest(request)
+       .then(function(res){
+         if (res.data.state == 'success'){
+           window.user.pendingRequestsToUsers.forEach(function(requests, idx){
+               if (requests.book._id == request.book._id ) {
+                 window.user.pendingRequestsToUsers.splice(idx, 1);
+               }
+           });
+         }
+         
+       },
+          function(err){
+           $scope.messageProfile = err;
+          }
+        );
+    };
     
      
 }]);
@@ -318,6 +344,10 @@ module.exports = angular.module('ProfilePageModule', []).service('ProfileBooksSv
             
             this.declineRequest = function(request){
                 return $http.put('/profile/decline', request);
+            };
+            
+            this.cancelRequest = function(request){
+                return $http.put('/profile/cancel', request);
             };
             
             // creates new book

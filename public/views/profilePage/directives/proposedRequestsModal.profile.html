@@ -15,8 +15,7 @@
                 <p><strong>Owner:</strong> <br>{{request.book.owner_name}}</p>
                 <p class='text-warning'>Status: {{request.status}}</p>
                 <p ng-if='request.reasonForDecline'>Reason: </p>
-                <buttton ng-if='!request.reasonForDecline' class="btn btn-danger btn-block" role="button">Cancel</button>
-                <buttton ng-if='request.reasonForDecline' class="btn btn-danger btn-block" role="button">Remove</button>
+                <buttton class="btn btn-danger btn-block" role="button" ng-click='cancelRequest(request, $parent.currentUser())'>{{ removeOrCancel(request) }}</button>
               </div>
             </div>
           </div>
