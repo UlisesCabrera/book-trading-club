@@ -26,10 +26,18 @@ angular.module('BookTradingClub', ['ngRoute', 'HomePageModule', 'ProfilePageModu
         templateUrl: 'views/profilePage/profilePage.html',
         controller: 'ProfilePageController'
       });
-}).controller('BookTradingClubController',['$scope', 
-    function($scope){
+}).controller('BookTradingClubController',['$scope', '$http',
+    function($scope, $http){
         $scope.currentUser = function() {
             return window.user ? window.user : null;
+        };
+        
+        $scope.signOut = function(){
+            $http.get('/auth/signout').then(function(r){
+                if (r.status == 200) {
+                    location.reload();
+                }
+            });
         };
 }]);
 },{"./bookPages/bookPages.module":2,"./homePage/homePage.module":8,"./profilePage/profilePage.module":11,"angular":16,"angular-route":14,"bootstrap":17,"jquery":30}],2:[function(require,module,exports){

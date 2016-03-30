@@ -25,9 +25,17 @@ angular.module('BookTradingClub', ['ngRoute', 'HomePageModule', 'ProfilePageModu
         templateUrl: 'views/profilePage/profilePage.html',
         controller: 'ProfilePageController'
       });
-}).controller('BookTradingClubController',['$scope', 
-    function($scope){
+}).controller('BookTradingClubController',['$scope', '$http',
+    function($scope, $http){
         $scope.currentUser = function() {
             return window.user ? window.user : null;
+        };
+        
+        $scope.signOut = function(){
+            $http.get('/auth/signout').then(function(r){
+                if (r.status == 200) {
+                    location.reload();
+                }
+            });
         };
 }]);
