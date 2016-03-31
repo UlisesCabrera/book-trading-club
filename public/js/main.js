@@ -274,11 +274,38 @@ module.exports = angular.module('HomePageModule',[]);
 require("./controllers/homePage.client.controller");
 require("./directives/homePage.client.directive");
 },{"./controllers/homePage.client.controller":6,"./directives/homePage.client.directive":7}],9:[function(require,module,exports){
-/*global angular*/
+/*global angular $*/
 
 module.exports = angular.module('ProfilePageModule')
- .controller('ProfilePageController', ['$scope','$routeParams', 'ProfileBooksSvc', 
-    function($scope, $routeParams, ProfileBooksSvc){
+ .controller('ProfilePageController', ['$scope','$routeParams', 'ProfileBooksSvc', 'ProfileUserSvc', 
+    function($scope, $routeParams, ProfileBooksSvc, ProfileUserSvc){
+
+     $scope.updateCityAndStateForm = {
+       city : '',
+       state: ''
+     };
+     
+     $scope.updateCityAndState = function(userId) {
+         ProfileUserSvc.updateCityAndState($scope.updateCityAndStateForm, userId)
+          .then(
+            function(res){
+               if (res.data.state == 'success'){
+                  window.user = res.data.user;
+               }
+               
+               $scope.messageProfile = res.data.message;
+               $scope.alertClassProfile = res.data.state == 'success' ? 'alert-success' : 'alert-warning';
+               // hides modal
+        	   $('#updateCityAndState').modal('hide');
+               
+            }, 
+            function(err){
+              if (err) {
+                $scope.messageProfile = err;
+                $('#updateCityAndState').modal('hide');
+              }
+          });
+     };
 
      $scope.removeOrCancel = function(request) {
         if (request.status == 'pending'){
@@ -415,6 +442,10 @@ module.exports = angular.module('ProfilePageModule')
      return {
          templateUrl: 'views/profilePage/directives/proposedRequestsModal.profile.html'
      };
+ }).directive('updateCityState',function(){
+     return {
+         templateUrl: 'views/profilePage/directives/updateCityAndStateModal.profile.html'
+     };
  })
 },{}],11:[function(require,module,exports){
 /*global angular*/
@@ -454,15 +485,12 @@ module.exports = angular.module('ProfilePageModule', []).service('ProfileBooksSv
                 return $http.put('/profile/requestBookBack', book);
             };
             
-            // creates new book
-            this.newBook = function(newBook) {
-                return $http.post('/books', newBook);
-            };
-            
-            this.deleteBook = function(bookId) {
-                return $http.delete('/books/' + bookId);  
-            };
-            
+}]).service('ProfileUserSvc', ['$http', function($http){
+                
+            this.updateCityAndState = function(cityAndState, userId) {
+                return $http.put('/profile/' + userId,  cityAndState)
+            };    
+    
 }]);
 },{}],13:[function(require,module,exports){
 /**

@@ -1,8 +1,35 @@
-/*global angular*/
+/*global angular $*/
 
 module.exports = angular.module('ProfilePageModule')
- .controller('ProfilePageController', ['$scope','$routeParams', 'ProfileBooksSvc', 
-    function($scope, $routeParams, ProfileBooksSvc){
+ .controller('ProfilePageController', ['$scope','$routeParams', 'ProfileBooksSvc', 'ProfileUserSvc', 
+    function($scope, $routeParams, ProfileBooksSvc, ProfileUserSvc){
+
+     $scope.updateCityAndStateForm = {
+       city : '',
+       state: ''
+     };
+     
+     $scope.updateCityAndState = function(userId) {
+         ProfileUserSvc.updateCityAndState($scope.updateCityAndStateForm, userId)
+          .then(
+            function(res){
+               if (res.data.state == 'success'){
+                  window.user = res.data.user;
+               }
+               
+               $scope.messageProfile = res.data.message;
+               $scope.alertClassProfile = res.data.state == 'success' ? 'alert-success' : 'alert-warning';
+               // hides modal
+        	   $('#updateCityAndState').modal('hide');
+               
+            }, 
+            function(err){
+              if (err) {
+                $scope.messageProfile = err;
+                $('#updateCityAndState').modal('hide');
+              }
+          });
+     };
 
      $scope.removeOrCancel = function(request) {
         if (request.status == 'pending'){

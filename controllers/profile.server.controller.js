@@ -258,3 +258,33 @@ exports.requestBookBack = function (req, res, next) {
     });
     
 };
+
+
+exports.updateCityAndState = function (req, res, next) {
+    var userId = new ObjectID(req.params.id);
+    
+    MongoClient.connect(process.env.MONGOURI, function(err, db){
+       assert.equal(err, null, 'error connecting to the database'); 
+       var users = db.collection('users');
+       
+       users.findOneAndUpdate({'_id': userId}, {
+           '$set': {
+               city : req.body.city,
+               state: req.body.state
+           }
+       }, {
+           upsert: true,
+           returnOriginal : false
+       }, function(err, result){
+           assert.equal(err, null, 'Error updating user city and state');
+           if (result.ok == 1){
+               res.send({state: 'success', message:'City and State updated', user : result.value});
+           } else {
+               res.send({state: 'failure', message: 'City and State not updated'});
+           }
+       });
+        
+        
+    });
+    
+};

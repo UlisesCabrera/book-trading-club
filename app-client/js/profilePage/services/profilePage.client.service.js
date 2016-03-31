@@ -25,13 +25,10 @@ module.exports = angular.module('ProfilePageModule', []).service('ProfileBooksSv
                 return $http.put('/profile/requestBookBack', book);
             };
             
-            // creates new book
-            this.newBook = function(newBook) {
-                return $http.post('/books', newBook);
-            };
-            
-            this.deleteBook = function(bookId) {
-                return $http.delete('/books/' + bookId);  
-            };
-            
+}]).service('ProfileUserSvc', ['$http', function($http){
+                
+            this.updateCityAndState = function(cityAndState, userId) {
+                return $http.put('/profile/' + userId,  cityAndState)
+            };    
+    
 }]);

@@ -16,4 +16,8 @@ module.exports = angular.module('ProfilePageModule')
      return {
          templateUrl: 'views/profilePage/directives/proposedRequestsModal.profile.html'
      };
+ }).directive('updateCityState',function(){
+     return {
+         templateUrl: 'views/profilePage/directives/updateCityAndStateModal.profile.html'
+     };
  })

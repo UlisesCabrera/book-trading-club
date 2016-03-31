@@ -1,8 +1,17 @@
+<div class="alert alert-dismissible" 
+     ng-class='alertClassProfile'
+     role="alert" 
+     ng-if='messageProfile'>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  {{ messageProfile }}
+</div>
+
+<update-city-state></update-city-state>
 
 <div class='row'>
     <div class='col-xs-12'>
         <div class="jumbotron">
-          <h1 class='text-center'>Hello, {{ $parent.currentUser().name }}</h1>
+          <h1 class='text-center'>Hello, {{ $parent.currentUser().name }} <small ng-if='$parent.currentUser().city && $parent.currentUser().state'>{{ $parent.currentUser().city}}, {{$parent.currentUser().state }}</small></h1>
           <div class="btn-group btn-group-justified" role="group">
               <div class="btn-group" role="group">
                   <button ng-disabled='$parent.currentUser().pendingRequestsFromUsers.length == 0' class="btn btn-primary" type="button"  data-toggle="modal" data-target="#pendingRequests">
