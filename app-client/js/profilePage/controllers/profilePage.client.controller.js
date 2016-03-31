@@ -15,7 +15,6 @@ module.exports = angular.module('ProfilePageModule')
      ProfileBooksSvc.getUserBooks($routeParams.user)
       .then(
        function(res){
-        console.log(res);
         $scope.myBooks =  res.data.books.ownedBooks;
         $scope.borrowedBooks = res.data.books.borrowedBooks;
       }, 
@@ -24,7 +23,6 @@ module.exports = angular.module('ProfilePageModule')
       }
     );
     
-    //TODO: update client when accepting the book, so it shows that its borrowed by someone. 
     $scope.acceptRequest = function(request, requestId){
      if (confirm('if you accept you will not be able to delete the book until the book is returned, is that ok?')) {
        ProfileBooksSvc.acceptRequest(request)

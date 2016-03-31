@@ -26,7 +26,9 @@ module.exports = function(passport){
 	  passport.authenticate('facebook', authCtrl.socialLoginLogic)
 	);
 
-	router.get('/signout', authCtrl.logout);	 
+	router.get('/signout', authCtrl.logout);
+	
+	router.get('/userState', authCtrl.checkUserState);
 	
 	return router;
 };

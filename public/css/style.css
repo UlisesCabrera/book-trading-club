@@ -1,5 +1,12 @@
-.thumbnail {
-  max-width: 400px; }
-
 .navbar-inverse .navbar-nav > li {
   text-align: center; }
+
+.media-object.img-thumbnail.mybooks-profile-img {
+  max-width: 100px; }
+
+@media (max-width: 400px) {
+  .btn-group-justified > .btn-group .btn {
+    font-size: 0.85rem; } }
+
+.thumbnail {
+  max-width: 400px; }

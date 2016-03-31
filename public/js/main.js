@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-/*global angular*/
+/*global angular location*/
 require('angular');
 require('angular-route');
 
@@ -20,11 +20,31 @@ angular.module('BookTradingClub', ['ngRoute', 'HomePageModule', 'ProfilePageModu
       })
       .when('/books',{
         templateUrl: 'views/bookPages/allBooksPage.html',
-        controller: 'AllBookPageController'
+        controller: 'AllBookPageController',
+		resolve : {
+			// checks for userstate before granting access to this route
+			userState : function($http, $location){
+				$http.get('auth/userState').then(function(res){
+					if(res.data.state === "failure") {
+						$location.path('/');
+					}
+				});
+			}
+		}
       })
       .when('/profile/:user', {
         templateUrl: 'views/profilePage/profilePage.html',
-        controller: 'ProfilePageController'
+        controller: 'ProfilePageController',
+		resolve : {
+			// checks for userstate before granting access to this route
+			userState : function($http, $location){
+				$http.get('auth/userState').then(function(res){
+					if(res.data.state === "failure") {
+						$location.path('/');
+					}
+				});
+			}
+		}
       });
 }).controller('BookTradingClubController',['$scope', '$http',
     function($scope, $http){
@@ -51,14 +71,12 @@ require("./services/books.client.service");
 require("./controllers/allBooksPage.client.controller");
 require("./directives/bookPages.client.directive");
 },{"./controllers/allBooksPage.client.controller":3,"./directives/bookPages.client.directive":4,"./services/books.client.service":5}],3:[function(require,module,exports){
-/*global angular*/
+/*global angular $*/
 
 module.exports = angular.module('BookPagesModule')
  .controller('AllBookPageController', ['$scope','BooksSvc', 
     function($scope, BooksSvc){
-   
-    $scope.test = 'hello All Books';
-    
+ 
     $scope.newBook = {
       name: '',
       imgUrl: '',
@@ -72,8 +90,28 @@ module.exports = angular.module('BookPagesModule')
     // will hold all the books
     $scope.books = [];
     
+    $scope.btnClassByStatus = function(status) {
+        var classBtn = 'btn-primary';
+        
+        switch(status){
+          case 'Requested' :
+              classBtn = 'btn-default';
+              break;
+          case 'Borrowed' :
+              classBtn = 'btn-info';
+              break;
+          case 'Declined' :
+              classBtn = 'btn-warning';
+              break;
+        }
+        
+        return classBtn;
+    };
+    
+    
+    
     $scope.requestStatus = function(user, book){
-       var status = 'request';
+       var status = 'Request';
        user.pendingRequestsToUsers.forEach(function(request){
            if (request.status === 'Returned') {
                 status = 'Request';
@@ -104,7 +142,9 @@ module.exports = angular.module('BookPagesModule')
                 
             	} else {
             		$scope.message = res.data.message;
+            		
             	}
+            	$scope.alertClass = res.data.state == 'success' ? 'alert-success' : 'alert-warning';
             },
             function(error) {
 	        	$scope.message = 'error getting to the server : ' + error.status + ' ' + error.statusText;
@@ -122,7 +162,8 @@ module.exports = angular.module('BookPagesModule')
                 				$scope.books.push(res.data.book);
             	   		} 
           	   			 // error, grab the error message from the response and display it on the form.
-          	   		  $scope.message = res.data.message;
+          	   		    $scope.message = res.data.message;
+          	   		    $scope.alertClass = res.data.state == 'success' ? 'alert-success' : 'alert-warning';
             	   		$scope.newBook = {name:'', imgUrl: ''};
         	   		    // hides modal
         	   		    $('#newBookModal').modal('hide');                  				
@@ -141,6 +182,7 @@ module.exports = angular.module('BookPagesModule')
               	   	 $scope.books.splice(bookIdx, 1);
               	   	 // error, grab the error message from the response and display it on the form.
               	   	 $scope.message = res.data.message;
+              	   	 $scope.alertClass = res.data.state == 'success' ? 'alert-success' : 'alert-warning';
                 },
                 function(error) {
           	        $scope.message = 'error getting to the server : ' + error.status + ' ' + error.statusText;
@@ -158,6 +200,7 @@ module.exports = angular.module('BookPagesModule')
                          window.user = res.data.user;
                      }
                      $scope.message = res.data.message;
+                     $scope.alertClass = res.data.state == 'success' ? 'alert-success' : 'alert-warning';
                      
                  },
                  function(error) {
@@ -248,7 +291,6 @@ module.exports = angular.module('ProfilePageModule')
      ProfileBooksSvc.getUserBooks($routeParams.user)
       .then(
        function(res){
-        console.log(res);
         $scope.myBooks =  res.data.books.ownedBooks;
         $scope.borrowedBooks = res.data.books.borrowedBooks;
       }, 
@@ -257,7 +299,6 @@ module.exports = angular.module('ProfilePageModule')
       }
     );
     
-    //TODO: update client when accepting the book, so it shows that its borrowed by someone. 
     $scope.acceptRequest = function(request, requestId){
      if (confirm('if you accept you will not be able to delete the book until the book is returned, is that ok?')) {
        ProfileBooksSvc.acceptRequest(request)

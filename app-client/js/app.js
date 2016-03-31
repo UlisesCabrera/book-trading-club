@@ -1,4 +1,4 @@
-/*global angular*/
+/*global angular location*/
 require('angular');
 require('angular-route');
 
@@ -19,11 +19,31 @@ angular.module('BookTradingClub', ['ngRoute', 'HomePageModule', 'ProfilePageModu
       })
       .when('/books',{
         templateUrl: 'views/bookPages/allBooksPage.html',
-        controller: 'AllBookPageController'
+        controller: 'AllBookPageController',
+		resolve : {
+			// checks for userstate before granting access to this route
+			userState : function($http, $location){
+				$http.get('auth/userState').then(function(res){
+					if(res.data.state === "failure") {
+						$location.path('/');
+					}
+				});
+			}
+		}
       })
       .when('/profile/:user', {
         templateUrl: 'views/profilePage/profilePage.html',
-        controller: 'ProfilePageController'
+        controller: 'ProfilePageController',
+		resolve : {
+			// checks for userstate before granting access to this route
+			userState : function($http, $location){
+				$http.get('auth/userState').then(function(res){
+					if(res.data.state === "failure") {
+						$location.path('/');
+					}
+				});
+			}
+		}
       });
 }).controller('BookTradingClubController',['$scope', '$http',
     function($scope, $http){

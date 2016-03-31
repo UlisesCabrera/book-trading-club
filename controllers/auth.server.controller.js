@@ -23,3 +23,13 @@ exports.logout = function(req, res) {
 		res.redirect('/');
 	}
 };
+
+exports.checkUserState = function(req, res){
+	// sends response back to client depending if there is 
+	// a passport user attached to the request object.
+	if (req.user){
+		res.send({state:'success'});
+	} else {
+		res.send({state:'failure'});	
+	}
+};

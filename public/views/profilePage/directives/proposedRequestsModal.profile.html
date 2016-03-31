@@ -7,7 +7,7 @@
       </div>
       <div class="modal-body">
         <div class='row'>
-          <div class="col-xs-4" ng-repeat='request in $parent.currentUser().pendingRequestsToUsers'>
+          <div class="col-xs-6 col-sm-4" ng-repeat='request in $parent.currentUser().pendingRequestsToUsers'>
             <div class="thumbnail">
               <img ng-src="{{request.book.imgUrl}}" alt="{{request.book.name}}">
               <div class="caption">

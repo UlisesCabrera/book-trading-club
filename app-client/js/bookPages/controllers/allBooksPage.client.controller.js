@@ -1,11 +1,9 @@
-/*global angular*/
+/*global angular $*/
 
 module.exports = angular.module('BookPagesModule')
  .controller('AllBookPageController', ['$scope','BooksSvc', 
     function($scope, BooksSvc){
-   
-    $scope.test = 'hello All Books';
-    
+ 
     $scope.newBook = {
       name: '',
       imgUrl: '',
@@ -19,8 +17,28 @@ module.exports = angular.module('BookPagesModule')
     // will hold all the books
     $scope.books = [];
     
+    $scope.btnClassByStatus = function(status) {
+        var classBtn = 'btn-primary';
+        
+        switch(status){
+          case 'Requested' :
+              classBtn = 'btn-default';
+              break;
+          case 'Borrowed' :
+              classBtn = 'btn-info';
+              break;
+          case 'Declined' :
+              classBtn = 'btn-warning';
+              break;
+        }
+        
+        return classBtn;
+    };
+    
+    
+    
     $scope.requestStatus = function(user, book){
-       var status = 'request';
+       var status = 'Request';
        user.pendingRequestsToUsers.forEach(function(request){
            if (request.status === 'Returned') {
                 status = 'Request';
@@ -51,7 +69,9 @@ module.exports = angular.module('BookPagesModule')
                 
             	} else {
             		$scope.message = res.data.message;
+            		
             	}
+            	$scope.alertClass = res.data.state == 'success' ? 'alert-success' : 'alert-warning';
             },
             function(error) {
 	        	$scope.message = 'error getting to the server : ' + error.status + ' ' + error.statusText;
@@ -69,7 +89,8 @@ module.exports = angular.module('BookPagesModule')
                 				$scope.books.push(res.data.book);
             	   		} 
           	   			 // error, grab the error message from the response and display it on the form.
-          	   		  $scope.message = res.data.message;
+          	   		    $scope.message = res.data.message;
+          	   		    $scope.alertClass = res.data.state == 'success' ? 'alert-success' : 'alert-warning';
             	   		$scope.newBook = {name:'', imgUrl: ''};
         	   		    // hides modal
         	   		    $('#newBookModal').modal('hide');                  				
@@ -88,6 +109,7 @@ module.exports = angular.module('BookPagesModule')
               	   	 $scope.books.splice(bookIdx, 1);
               	   	 // error, grab the error message from the response and display it on the form.
               	   	 $scope.message = res.data.message;
+              	   	 $scope.alertClass = res.data.state == 'success' ? 'alert-success' : 'alert-warning';
                 },
                 function(error) {
           	        $scope.message = 'error getting to the server : ' + error.status + ' ' + error.statusText;
@@ -105,6 +127,7 @@ module.exports = angular.module('BookPagesModule')
                          window.user = res.data.user;
                      }
                      $scope.message = res.data.message;
+                     $scope.alertClass = res.data.state == 'success' ? 'alert-success' : 'alert-warning';
                      
                  },
                  function(error) {
