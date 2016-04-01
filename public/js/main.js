@@ -45,7 +45,10 @@ angular.module('BookTradingClub', ['ngRoute', 'HomePageModule', 'ProfilePageModu
 				});
 			}
 		}
+      }).otherwise({
+        redirectTo: '/'
       });
+      
 }).controller('BookTradingClubController',['$scope', '$http',
     function($scope, $http){
         $scope.currentUser = function() {
@@ -254,7 +257,7 @@ module.exports = angular.module('BookPagesModule', []).service('BooksSvc', ['$ht
 module.exports = angular.module('HomePageModule')
  .controller('HomePageController', ['$scope', 
     function($scope){
-    $scope.test = 'hello homepage'
+    $scope.features = ['Catalogue your books online' , 'See all of the books our users own', 'Request to borrow other users\' books', 'Easily manage books and requests from your dashboard']
 }]);
 },{}],7:[function(require,module,exports){
 /*global angular*/

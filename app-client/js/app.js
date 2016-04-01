@@ -44,7 +44,10 @@ angular.module('BookTradingClub', ['ngRoute', 'HomePageModule', 'ProfilePageModu
 				});
 			}
 		}
+      }).otherwise({
+        redirectTo: '/'
       });
+      
 }).controller('BookTradingClubController',['$scope', '$http',
     function($scope, $http){
         $scope.currentUser = function() {
